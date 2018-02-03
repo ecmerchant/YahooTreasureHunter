@@ -1,0 +1,124 @@
+<div class="container">
+  <div class="bg-primary" style="align-items: center;">
+    <h1 style="padding: 10px;">ヤフオク!お宝ハンター</h1>
+  </div>
+  <h4>ログイン中：<%= @user %>&nbsp;&nbsp;&nbsp;&nbsp;<%= link_to "MWSアカウントの設定", {:controller => "items", :action => "regist"}, {:target => "_blank"} %>&nbsp;&nbsp;&nbsp;&nbsp;<%= link_to "ヤフオク設定", {:controller => "items", :action => "setup"}, {:target => "_blank"} %>&nbsp;&nbsp;&nbsp;<%= link_to 'ログアウト', destroy_user_session_path, method: :get %>&nbsp;&nbsp;&nbsp;<%= link_to '管理者専用', rails_admin_path, method: :get %></h4>
+
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active" role="presentation">
+      <a aria-controls="tab_a" data-toggle="tab" href="#tab_a" role="tab">1.商品情報の取得</a>
+    </li>
+    <li role="presentation">
+      <a aria-controls="tab_b" data-toggle="tab" href="#tab_b" role="tab">2.出品CSVの作成</a>
+    </li>
+    <li role="presentation">
+      <a aria-controls="tab_c" data-toggle="tab" href="#tab_c" role="tab">3.出品情報の設定</a>
+    </li>
+    <li role="presentation">
+      <a aria-controls="tab_d" data-toggle="tab" href="#tab_d" role="tab">4.ASINの登録</a>
+    </li>
+  </ul>
+  <br>
+  <div class="tab-content">
+    <div class="tab-pane active" id="tab_a" role="tabpanel">
+      <form class="form-inline form-group">
+        <div class="form-group">
+          <label for="maxnumber">取得件数</label>
+          <input type="number" id="maxnumber" value="9600" class="form-control" style="width: 80px;">
+        </div>
+        &nbsp;&nbsp;
+        <div class="form-group">
+          <label for="input_url">URL</label>
+          <input type="text" id="input_url" class="form-control" placeholder="Input Amazon URL Here .." style="width: 140px;">
+        </div>
+
+        <div class="form-group">
+          <select class="form-control" id="input_type" name="input_type">
+            <option value="1" selected="selected">URL</option>
+            <option value="2" >ASIN</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <button id="submit_url" class="btn btn-primary" type="button" style="width: 120px;">アマゾン取得</button>
+        </div>
+        &nbsp;
+
+        <div class="form-group">
+          <select class="form-control" id="qtype" name="number">
+            <option value="1" selected="selected">型番</option>
+            <option value="2" >商品名</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <button id="connet_yahoo" class="btn btn-primary" type="button" style="width: 120px;">ヤフオク取得</button>
+        </div>
+        &nbsp;
+        <div class="form-group">
+          <button id="reload_yahoo" class="btn btn-primary" type="button" style="width: 120px;">データの更新</button>
+        </div>
+        &nbsp;
+        <div class="form-group">
+          <button id="setcsv" class="btn btn-primary" type="button" style="width: 100px;">CSV作成</button>
+        </div>
+        &nbsp;
+        <div class="form-group">
+          <button id="hide" class="btn btn-primary" type="button" style="width: 80px;">非表示</button>
+        </div>
+      </form>
+      <input id="progress" value="continue" type="hidden" />
+      <br>
+      <div id="selected"></div>
+      <div id="result"></div>
+    </div>
+
+    <div class="tab-pane" id="tab_b" role="tabpanel">
+      <p>出品CSVの確認</p>
+      <button id="upload" class="btn btn-primary" type="button" style="width: 140px;">CSVアップロード</button>
+      &nbsp;
+      <% @tt=Time.now.strftime("_%Y%m%d%H%M") %>
+      <a href="#" id="output" download="list<%= @tt %>.txt" class="btn btn-primary" style="width: 80px;">CSV出力</a>
+      <br><br>
+      <div id="selected_csv"></div>
+      <div id="result_csv"></div>
+    </div>
+
+    <div class="tab-pane" id="tab_c" role="tabpanel">
+      <p>出品CSV作成時の詳細項目を設定</p>
+      <button id="fixed_save" class="btn btn-primary" type="button" style="width: 140px;">CSV設定保存</button>
+      <br><br>
+      <div id="fixed_csv"></div>
+    </div>
+
+    <div class="tab-pane" id="tab_d" role="tabpanel">
+      <div class="row">
+        <div class="col-sm-12">
+          <p>ASIN設定の保存</p>
+        </div>
+        <div class="col-sm-2">
+          <button id="set_asin_btn" class="btn btn-primary" type="button" style="width: 140px;">設定保存</button>
+        </div>
+        <div class="col-sm-10">
+          <%= form_tag('/items/clear', method: :post) do %>
+             <%= submit_tag "設定のクリア", class: "btn btn-info", style: "width: 140px;" %>
+          <% end %>
+        </div>
+        <div class="col-sm-12">
+          <br>
+        </div>
+        <div class="col-sm-3">
+          <p>情報取得したいASINを入力</p>
+          <div id="set_asin"></div>
+        </div>
+        <div class="col-sm-3">
+          <p>除外したいASINを入力</p>
+          <div id="ng_asin"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<%= javascript_include_tag 'items_show', 'data-turbolinks-track': 'reload'  %>
