@@ -24,7 +24,6 @@ ActiveRecord::Schema.define(version: 20180201142648) do
     t.text     "list"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string   "user"
   end
 
   create_table "fvalues", force: :cascade do |t|
