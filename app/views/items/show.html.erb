@@ -56,15 +56,27 @@
         </div>
         &nbsp;
         <div class="form-group">
-          <button id="reload_yahoo" class="btn btn-primary" type="button" style="width: 120px;">データの更新</button>
+          <% if @account_level != true then  %>
+            <button id="reload_yahoo" class="btn btn-primary" type="button" style="width: 120px;">データの更新</button>
+          <% else %>
+            <button id="reload_yahoo" class="btn btn-primary" type="button" style="width: 120px;" disabled >データの更新</button>
+          <% end %>
         </div>
         &nbsp;
         <div class="form-group">
-          <button id="setcsv" class="btn btn-primary" type="button" style="width: 100px;">CSV作成</button>
+          <% if @account_level != true then  %>
+            <button id="setcsv" class="btn btn-primary" type="button" style="width: 100px;">CSV作成</button>
+          <% else %>
+            <button id="setcsv" class="btn btn-primary" type="button" style="width: 100px;" disabled >CSV作成</button>
+          <% end %>
         </div>
         &nbsp;
         <div class="form-group">
-          <button id="hide" class="btn btn-primary" type="button" style="width: 80px;">非表示</button>
+          <% if @account_level != true then  %>
+            <button id="hide" class="btn btn-primary" type="button" style="width: 80px;">非表示</button>
+          <% else %>
+            <button id="hide" class="btn btn-primary" type="button" style="width: 80px;" disabled >非表示</button>
+          <% end %>
         </div>
       </form>
       <input id="progress" value="continue" type="hidden" />
@@ -75,10 +87,18 @@
 
     <div class="tab-pane" id="tab_b" role="tabpanel">
       <p>出品CSVの確認</p>
-      <button id="upload" class="btn btn-primary" type="button" style="width: 140px;">CSVアップロード</button>
-      &nbsp;
-      <% @tt=Time.now.strftime("_%Y%m%d%H%M") %>
-      <a href="#" id="output" download="list<%= @tt %>.txt" class="btn btn-primary" style="width: 80px;">CSV出力</a>
+
+      <% if @account_level != true then  %>
+        <button id="upload" class="btn btn-primary" type="button" style="width: 140px;">CSVアップロード</button>
+        &nbsp;
+        <% @tt=Time.now.strftime("_%Y%m%d%H%M") %>
+        <a href="#" id="output" download="list<%= @tt %>.txt" class="btn btn-primary" style="width: 80px;">CSV出力</a>
+      <% else %>
+        <button id="upload" class="btn btn-primary" type="button" style="width: 140px;" disabled >CSVアップロード</button>
+        &nbsp;
+        <% @tt=Time.now.strftime("_%Y%m%d%H%M") %>
+        <a class="btn btn-primary" style="width: 80px;" disabled>CSV出力</a>
+      <% end %>
       <br><br>
       <div id="selected_csv"></div>
       <div id="result_csv"></div>
@@ -86,7 +106,12 @@
 
     <div class="tab-pane" id="tab_c" role="tabpanel">
       <p>出品CSV作成時の詳細項目を設定</p>
-      <button id="fixed_save" class="btn btn-primary" type="button" style="width: 140px;">CSV設定保存</button>
+      <% if @account_level != true then  %>
+        <button id="fixed_save" class="btn btn-primary" type="button" style="width: 140px;">CSV設定保存</button>
+      <% else %>
+        <button id="fixed_save" class="btn btn-primary" type="button" style="width: 140px;" disabled>CSV設定保存</button>
+      <% end %>
+      
       <br><br>
       <div id="fixed_csv"></div>
     </div>

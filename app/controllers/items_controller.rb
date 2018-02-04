@@ -25,6 +25,9 @@ class ItemsController < ApplicationController
       gon.list = false
     end
 
+    gon.trial = User.find_by(email: @user).trial_flg
+    @account_level = gon.trial
+
     rt = Asin.where(user:current_user.email).pluck("rasin")
     nrt = []
     k = 0
@@ -112,7 +115,7 @@ class ItemsController < ApplicationController
     logger.debug(reg_asin)
     user = current_user.email
 
-    if User.find_by(user: user).access_flg != true then
+    if User.find_by(email: user).access_flg != true then
       maxnum = 20
     end
 
@@ -387,7 +390,7 @@ class ItemsController < ApplicationController
     doc = Nokogiri::XML(parser.body)
 
     submissionId = doc.xpath(".//mws:FeedSubmissionId", {"mws"=>"http://mws.amazonaws.com/doc/2009-01-01/"}).text
-
+=begin
     process = ""
     err = 0
     while process != "_DONE_" do
@@ -410,7 +413,7 @@ class ItemsController < ApplicationController
     logger.debug("\n\n")
     #submissionId = doc.match(/FeedSubmissionId>([\s\S]*?)<\/Feed/)[1]
     #parser.parse # will return a Hash object
-
+=end
     res = ["test"]
     render json: res
   end
