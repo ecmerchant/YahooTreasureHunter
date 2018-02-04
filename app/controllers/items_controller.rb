@@ -112,6 +112,10 @@ class ItemsController < ApplicationController
     logger.debug(reg_asin)
     user = current_user.email
 
+    if User.find_by(user: user).access_flg != true then
+      maxnum = 20
+    end
+
     if input_type == 1 then
       logger.debug("Case URL")
       j = 0
@@ -180,21 +184,17 @@ class ItemsController < ApplicationController
 
     end
 
-    #saws = account.AWSkey
-    #skey = account.Skey
-    #sid = account.SellerId
-
     saws = ENV["AWS_ACCESS_KEY_ID"]
     skey = ENV["AWS_SECRET_ACCESS_KEY"]
     sid = account.SellerId
     token = account.AWSkey
-    #token = "amzn.mws.86aa0fcb-dd12-56ec-da96-04b32d4581d9"
 
     client = MWS.products(
       primary_marketplace_id: "A1VC38T7YXB528",
       merchant_id: sid,
       aws_access_key_id: saws,
-      aws_secret_access_key: skey
+      aws_secret_access_key: skey,
+      auth_token: token
     )
     id_type = 'ASIN'
     asin = []
@@ -335,18 +335,24 @@ class ItemsController < ApplicationController
     logger.debug("Debug Start!")
     current_email = current_user.email
 
-    user= Mws.find_by(user:current_email)
-    aws = user.AWSkey
-    skey = user.Skey
-    seller = user.SellerId
+    user = current_user.email
+    if User.find_by(user: user).access_flg != true then
+      redirect_to items_show_path
+    end
 
+    user= Mws.find_by(user:current_email)
+    saws = ENV["AWS_ACCESS_KEY_ID"]
+    skey = ENV["AWS_SECRET_ACCESS_KEY"]
+    sid = user.SellerId
+    token = user.AWSkey
     res = params[:data]
 
     client = MWS.feeds(
       primary_marketplace_id: "A1VC38T7YXB528",
       merchant_id: seller,
       aws_access_key_id: aws,
-      aws_secret_access_key: skey
+      aws_secret_access_key: skey,
+      auth_token: token
     )
 
     res1 = JSON.parse(res)
@@ -413,6 +419,11 @@ class ItemsController < ApplicationController
   def reload
     body = params[:data]
     furl = body[:url]
+
+    user = current_user.email
+    if User.find_by(user: user).access_flg != true then
+      redirect_to items_show_path
+    end
 
     if furl != nil && furl != "" then
 
