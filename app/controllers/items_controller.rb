@@ -126,6 +126,7 @@ class ItemsController < ApplicationController
       charset = nil
 
       url = org_url + '&page=' + pgnum.to_s
+      logger.debug(url)
       user_agent = "Mozilla/5.0 (Windows NT 6.1; rv:28.0) Gecko/20100101 Firefox/28.0"
 
       begin

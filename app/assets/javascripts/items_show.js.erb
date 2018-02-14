@@ -113,6 +113,7 @@ $("#hide").click(function () {
 });
 
 $("#submit_url").click(function () {
+  Handsontable.hooks.destroy;
   if(document.getElementById("submit_url").innerText == "アマゾン取得"){
     alert("アマゾンの情報取得を開始します");
     var url = document.getElementById("input_url").value;
@@ -152,7 +153,6 @@ function repajax(url,pgnum,cnum){
     alert("試用アカウントのため20件までの取得に制限されます");
     maxnum = 20;
   }
-
 
   var body = [];
   body[0] = url;
@@ -205,7 +205,7 @@ function repajax(url,pgnum,cnum){
       }else{
         handsontable.loadData(org_data);
         pgnum++;
-        sleep(1500,repajax(url,pgnum,cnum));
+        sleep(500,repajax(url,pgnum,cnum));
       }
 
     },
@@ -220,7 +220,7 @@ function repajax(url,pgnum,cnum){
 
 
 $("#connet_yahoo").click(function () {
-
+  Handsontable.hooks.destroy;
   if(document.getElementById("connet_yahoo").innerText == "ヤフオク取得"){
     /*
     var org = handsontable.getData();
@@ -262,7 +262,68 @@ function ConnectYahoo(rownum){
   var myData = {data: query};
 
   if(document.getElementById("progress").value == "cancel"){
-    alert("中断します")
+    alert("中断します");
+    Handsontable.hooks.add('afterChange', function() {
+      console.log(arguments);
+      var res = arguments[0][0];
+
+      var row = res[0];
+      var col = res[1];
+      var bf = res[2];
+      var af = res[3];
+      if(((col > 11) && ((col - 9) % 11 == 0))){
+        if(af == true){
+          var na = [];
+          var sp = 0;
+          var pf = 0;
+          var by = 0;
+
+          var d = handsontable.getDataAtRow(row);
+          var cp = d[col + 5];
+          var bp = d[col + 6];
+          var f = d[13]/100;
+          sp = d[10];
+          if(bp != '-'){
+            by = bp;
+          }else{
+            by = cp;
+          }
+          pf = sp * (1-f) - by;
+          na[0] = [];
+          na[0][0] = row;
+          na[0][1] = 3;
+          na[0][2] = sp;
+          na[1] = [];
+          na[1][0] = row;
+          na[1][1] = 4;
+          na[1][2] = pf;
+          na[2] = [];
+          na[2][0] = row;
+          na[2][1] = 5;
+          na[2][2] = by;
+          na[3] = [];
+          na[3][0] = row;
+          na[3][1] = 2;
+          na[3][2] = d[col+2];
+
+          var nb = [];
+          var q = 0;
+          for(var p = 0; p < 20; p++){
+            if((20 + p*11) != col){
+              nb[q] = [];
+              nb[q][0] = row;
+              nb[q][1] = 20 + p*11;
+              nb[q][2] = false;
+              q++;
+            }
+          }
+
+          handsontable.setDataAtCell(na);
+          handsontable.setDataAtCell(nb);
+          handsontable.render();
+        }
+      }
+    }, handsontable);
     return;
   }
 
@@ -311,6 +372,73 @@ function ConnectYahoo(rownum){
         document.getElementById("connet_yahoo").innerText = "ヤフオク取得";
         document.getElementById("connet_yahoo").className = "btn btn-primary";
         document.getElementById("progress").value = "cancel";
+
+        ////
+        Handsontable.hooks.add('afterChange', function() {
+
+          var res = arguments[0][0];
+
+          var row = res[0];
+          var col = res[1];
+          var bf = res[2];
+          var af = res[3];
+          if(((col > 11) && ((col - 9) % 11 == 0))){
+            if(af == true){
+              var na = [];
+              var sp = 0;
+              var pf = 0;
+              var by = 0;
+
+              var d = handsontable.getDataAtRow(row);
+              var cp = d[col + 5];
+              var bp = d[col + 6];
+              var f = d[13]/100;
+              sp = d[10];
+              if(bp != '-'){
+                by = bp;
+              }else{
+                by = cp;
+              }
+              pf = sp * (1-f) - by;
+              na[0] = [];
+              na[0][0] = row;
+              na[0][1] = 3;
+              na[0][2] = sp;
+              na[1] = [];
+              na[1][0] = row;
+              na[1][1] = 4;
+              na[1][2] = pf;
+              na[2] = [];
+              na[2][0] = row;
+              na[2][1] = 5;
+              na[2][2] = by;
+              na[3] = [];
+              na[3][0] = row;
+              na[3][1] = 2;
+              na[3][2] = d[col+2];
+
+              var nb = [];
+              var q = 0;
+              for(var p = 0; p < 20; p++){
+                if((20 + p*11) != col){
+                  nb[q] = [];
+                  nb[q][0] = row;
+                  nb[q][1] = 20 + p*11;
+                  nb[q][2] = false;
+                  q++;
+                }
+              }
+
+              handsontable.setDataAtCell(na);
+              handsontable.setDataAtCell(nb);
+              handsontable.render();
+            }
+          }
+          handsontable.render();
+        }, handsontable);
+
+        ///
+
       }
     },
     error: function (resData) {
@@ -783,69 +911,6 @@ $("#set_asin_btn").click(function () {
     }
   });
 });
-
-//出品候補にチェックが入った場合
-Handsontable.hooks.add('afterChange', function() {
-  var res = arguments[0][0];
-  var row = res[0];
-  var col = res[1];
-  var bf = res[2];
-  var af = res[3];
-  if(((col > 11) && ((col - 9) % 11 == 0))){
-    if(af == true){
-      var na = [];
-      var sp = 0;
-      var pf = 0;
-      var by = 0;
-
-      var d = handsontable.getDataAtRow(row);
-      var cp = d[col + 5];
-      var bp = d[col + 6];
-      var f = d[13]/100;
-      sp = d[10];
-      if(bp != '-'){
-        by = bp;
-      }else{
-        by = cp;
-      }
-      pf = sp * (1-f) - by;
-      na[0] = [];
-      na[0][0] = row;
-      na[0][1] = 3;
-      na[0][2] = sp;
-      na[1] = [];
-      na[1][0] = row;
-      na[1][1] = 4;
-      na[1][2] = pf;
-      na[2] = [];
-      na[2][0] = row;
-      na[2][1] = 5;
-      na[2][2] = by;
-      na[3] = [];
-      na[3][0] = row;
-      na[3][1] = 2;
-      na[3][2] = d[col+2];
-
-      var nb = [];
-      var q = 0;
-      for(var p = 0; p < 20; p++){
-        if((20 + p*11) != col){
-          nb[q] = [];
-          nb[q][0] = row;
-          nb[q][1] = 20 + p*11;
-          nb[q][2] = false;
-          q++;
-        }
-      }
-
-      handsontable.setDataAtCell(na);
-      handsontable.setDataAtCell(nb);
-      handsontable.render();
-
-    }
-  }
-  handsontable.render();
-}, handsontable);
 
 
 function sleep(time, callback){
