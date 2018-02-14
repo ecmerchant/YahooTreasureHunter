@@ -151,7 +151,7 @@ class ItemsController < ApplicationController
         if doc.xpath('//div[@id=' + check + ']')[0] == nil then
           if ng_asin.flatten.include?(list.value) == false then
             data[j] = []
-            for x in 0..28
+            for x in 0..15
               data[j][x] = ""
             end
             data[j][0] = false
@@ -170,11 +170,12 @@ class ItemsController < ApplicationController
           break
         end
         data[j] = []
-        for x in 0..28
+        for x in 0..15
           data[j][x] = ""
         end
         data[j][0] = false
-        data[j][1] = false
+        data[j][6] = '<a href="http://mnrate.com/item/aid/' + reg_asin[j][0] + '" target="_blank">' + 'http://mnrate.com/item/aid/' + reg_asin[j][0] + '</a>'
+
         data[j][9] = reg_asin[j][0]
         data[j][14] = "⇒"
         j += 1
@@ -191,6 +192,13 @@ class ItemsController < ApplicationController
     skey = ENV["AWS_SECRET_ACCESS_KEY"]
     sid = account.SellerId
     token = account.AWSkey
+
+    logger.debug("===============")
+    logger.debug(saws)
+    logger.debug(skey)
+    logger.debug(sid)
+    logger.debug(token)
+    logger.debug("===============")
 
     client = MWS.products(
       primary_marketplace_id: "A1VC38T7YXB528",
@@ -258,9 +266,9 @@ class ItemsController < ApplicationController
           end
 
           if image != nil then
-            data[k][2] = '<img src="' + image + '" width="80" height="60">'
+            data[k][1] = '<img src="' + image + '" width="80" height="60">'
           else
-            data[k][2] = ""
+            data[k][1] = ""
           end
           data[k][7] = '<a href="https://amazon.co.jp/dp/' + data[k][9] + '" target="_blank">' + 'https://amazon.co.jp/dp/' + data[k][7] + '</a>'
           data[k][8] = title
@@ -586,6 +594,15 @@ class ItemsController < ApplicationController
       minPrice = 0
     end
 
+    result = [
+      "",
+      surl,
+      keyword,
+      maxPrice,
+      avgPrice,
+      "",
+    ];
+
     #開催中オークションへのアクセス
     charset = nil
     ua = CSV.read('app/others/User-Agent.csv', headers: false, col_sep: "\t")
@@ -593,6 +610,8 @@ class ItemsController < ApplicationController
     user_agent = ua[rand(uanum)][0]
     logger.debug("\n\nagent is ")
     logger.debug(user_agent)
+    surl = surl + "&s1=end&o1=a" #並び順を終了時間でソート
+    logger.debug(surl)
     begin
       html = open(surl, "User-Agent" => user_agent) do |f|
         charset = f.charset
@@ -605,45 +624,84 @@ class ItemsController < ApplicationController
     end
     doc = Nokogiri::HTML.parse(html, nil, charset)
 
+    #ヒットした商品を抜出
+    item_num = doc.xpath('//td[@class="i"]').count
+    logger.debug("item num is")
+    logger.debug(item_num)
+    temp = doc.xpath('//td[@class="i"]')
 
-    temp = doc.xpath('//td[@class="i"]')[0]
+    if item_num > 20 then
+      item_num = 20
+    end
 
-    if temp != nil then
-      furl = temp.css('a')[0][:href]
-      title = doc.xpath('//h3')[0].inner_text
-      image = temp.css('img')[0][:src]
-      image = '<img src="' + image + '" width="80" height="60">'
-      cPrice = doc.xpath('//td[@class="pr1"]')[0].inner_html
-      bPrice = doc.xpath('//td[@class="pr2"]')[0].inner_html
+    if item_num > 0 then
+      for p in 0..item_num-1
+        furl = doc.xpath('//td[@class="a1"]')[p].css('a')[0][:href]
+        title = doc.xpath('//td[@class="a1"]')[p].xpath('.//h3')[0].inner_text
+        image = temp[p].css('img')[0][:src]
+        image = '<img src="' + image + '" width="80" height="60">'
 
-      if cPrice.index("span") == nil then
-        cPrice = doc.xpath('//td[@class="pr1"]/text()')[0]
-      else
-        cPrice = doc.xpath('//td[@class="pr1"]/span/text()')[0]
+        bitnum = doc.xpath('//td[@class="bi"]')[p].inner_text
+        rest = doc.xpath('//td[@class="ti"]')[p].inner_text
+
+        cPrice = doc.xpath('//td[@class="pr1"]')[p].inner_html
+        bPrice = doc.xpath('//td[@class="pr2"]')[p].inner_html
+
+        if cPrice.index("span") == nil then
+          cPrice = doc.xpath('//td[@class="pr1"]')[p].xpath('./text()')[0]
+        else
+          cPrice = doc.xpath('//td[@class="pr1"]')[p].xpath('./span/text()')[0]
+        end
+
+        if bPrice.index("span") == nil then
+          bPrice = doc.xpath('//td[@class="pr2"]')[p].xpath('./text()')[0]
+        else
+          bPrice = doc.xpath('//td[@class="pr2"]')[p].xpath('./span/text()')[0]
+        end
+
+        if cPrice != nil then
+          cPrice = cPrice.inner_text
+          cPrice = CCur(cPrice)
+        else
+          cPrice = 0
+        end
+
+        if bPrice != nil then
+          bPrice = bPrice.inner_text
+          bPrice = CCur(bPrice)
+        else
+          bPrice = 0
+        end
+
+        condition = "中古"
+        if doc.xpath('//td[@class="a1"]')[p].xpath('.//li[@class="cic1"]').count > 0 then
+          condition = "新品"
+        end
+
+        rank = ""
+        if doc.xpath('//div[@class="a4 cf"]')[p].xpath('.//span[@class="icMasSil"]').count > 0 then
+          rank = "シルバー"
+        end
+        if doc.xpath('//div[@class="a4 cf"]')[p].xpath('.//span[@class="icMasGld"]').count > 0 then
+          rank = "ゴールド"
+        end
+        if doc.xpath('//div[@class="a4 cf"]')[p].xpath('.//span[@class="icMasDia"]').count > 0 then
+          rank = "ダイヤモンド"
+        end
+        aucid = furl.match(/auction\/([\s\S]*?)$/)[1]
+        furl = MkURL(furl)
+        result.push("false")
+        result.push(furl)
+        result.push(image)
+        result.push(title)
+        result.push(aucid)
+        result.push(cPrice)
+        result.push(bPrice)
+        result.push(bitnum)
+        result.push(rest)
+        result.push(condition)
+        result.push(rank)
       end
-
-      logger.debug(bPrice)
-      if bPrice.index("span") == nil then
-        bPrice = doc.xpath('//td[@class="pr2"]/text()')[0]
-      else
-        bPrice = doc.xpath('//td[@class="pr2"]/span/text()')[0]
-      end
-      logger.debug(cPrice)
-
-      if cPrice != nil then
-        cPrice = cPrice.inner_text
-        cPrice = CCur(cPrice)
-      else
-        cPrice = 0
-      end
-
-      if bPrice != nil then
-        bPrice = bPrice.inner_text
-        bPrice = CCur(bPrice)
-      else
-        bPrice = 0
-      end
-      aucid = ""
     else
       furl = ""
       title = "該当なし"
@@ -651,81 +709,32 @@ class ItemsController < ApplicationController
       cPrice = 0
       bPrice = 0
       aucid = ""
+      condition = ""
+      rank = ""
+
+      result.push("false")
+      result.push(furl)
+      result.push(image)
+      result.push(title)
+      result.push(aucid)
+      result.push(cPrice)
+      result.push(bPrice)
+      result.push("")
+      result.push("")
+      result.push(condition)
+      result.push(rank)
+
     end
 
     if surl != nil && surl != "" then
       surl = '<a href="' + surl + '" target="_blank">' + surl + '</a>'
     end
 
-    if furl != nil && furl != "" then
-
-      charset = nil
-      ua = CSV.read('app/others/User-Agent.csv', headers: false, col_sep: "\t")
-      uanum = ua.length
-      user_agent = ua[rand(uanum)][0]
-      logger.debug("\n\nagent is ")
-      logger.debug(user_agent)
-      begin
-        html = open(furl, "User-Agent" => user_agent) do |f|
-          charset = f.charset
-          f.read # htmlを読み込んで変数htmlに渡す
-        end
-      rescue OpenURI::HTTPError => error
-        response = error.io
-        logger.debug("error!!\n")
-        logger.debug(error)
-      end
-
-      doc = Nokogiri::HTML.parse(html, nil, charset)
-
-      temp = doc.xpath('//ul[@class="ProductImage__images"]')[0]
-      images = temp.css('img')
-      b = 0
-      imgs = []
-      for img in images
-        imgs[b] = img[:src]
-        b += 1
-      end
-      furl = '<a href="' + furl + '" target="_blank">' + furl + '</a>'
-      aucid = doc.xpath('//dd[@class="ProductDetail__description"]/text()')[10].inner_text
-      seller = doc.xpath('//span[@class="Seller__name"]/a')[0].inner_text
-      pfb = doc.xpath('//span[@class="Seller__ratingGood"]')[0].inner_text
-      nfb = doc.xpath('//span[@class="Seller__ratingBad"]')[0].inner_text
-    end
-
     #利益などの計算
 
-    result = [
-      image,
-      surl,
-      keyword,
-      maxPrice,
-      avgPrice,
-      "",
-      furl,
-      title,
-      aucid,
-      cPrice,
-      bPrice,
-      seller,
-      pfb,
-      nfb
-    ];
 
-    maxnumber = 5
-    if furl != nil && furl != "" then
-      for p in 0..maxnumber
-        if p > imgs.length then
-          result.push("")
-        else
-          result.push(imgs[p])
-        end
-      end
-    else
-      for p in 0..maxnumber
-        result.push("")
-      end
-    end
+
+
     render json:result
   end
 
@@ -834,6 +843,11 @@ class ItemsController < ApplicationController
     res = res.gsub(/円/,"")
     res = res.gsub(/ /,"")
     res = res.to_i
+    return res
+  end
+
+  private def MkURL(url)
+    res = '<a href="' + url + '" target="_blank">' + url + '</a>'
     return res
   end
 

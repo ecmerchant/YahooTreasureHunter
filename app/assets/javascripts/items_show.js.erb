@@ -3,32 +3,71 @@
 var maxRownum = 9600;
 var mydata = [];
 var colOption = [];
-var cheaders = ["出品","更新","アマゾン","ヤフオク","販売価格","見込利益","仕入価格","商品URL","商品タイトル","ASIN","中古最安値","新品最安値","型番","販売手数料[%]","⇒","検索URL","検索キー","最高落札価格","平均落札価格","","候補URL","商品名","ヤフオクID","現在価格","即決価格","出品者","良い評価","悪い評価","画像1","画像2","画像3","画像4","画像5"];
-var maxColnum = cheaders.length;
+var cheaders = ["出品","アマゾン","ヤフオク","販売価格","見込利益","仕入価格","モノレート","商品URL","商品タイトル","ASIN","中古最安値","新品最安値","型番","販売手数料[%]","⇒","検索URL","検索キー","最高落札価格","平均落札価格",""];
 
+for(var q = 0; q < 20; q++){
+  cheaders.push("候補" + String(q+1));
+  cheaders.push("URL" + String(q+1));
+  cheaders.push("画像" + String(q+1));
+  cheaders.push("商品名" + String(q+1));
+  cheaders.push("ヤフオクID" + String(q+1));
+  cheaders.push("現在価格" + String(q+1));
+  cheaders.push("即決価格" + String(q+1));
+  cheaders.push("入札件数" + String(q+1));
+  cheaders.push("残り時間" + String(q+1));
+  cheaders.push("商品状態" + String(q+1));
+  cheaders.push("出品者" + String(q+1));
+}
+
+var maxColnum = cheaders.length;
+var colWidth = [];
+var col2 = [];
 
 for(var i = 0; i < maxRownum; i++){
   mydata[i] = [];
   for(var j = 0; j < maxColnum; j++){
     mydata[i][j] = "";
+    if(j == 0 || ((j > 11) && ((j-9) % 11 == 0))){
+      mydata[i][j] = false;
+    }
   }
   mydata[i][14] = "⇒";
-  mydata[i][0] = false;
-  mydata[i][1] = false;
 }
 
 for(var i = 0; i < maxColnum; i++){
-  colOption[i] = "";
-  if(i == 0 || i == 1){
+  colOption[i] = {className: 'htCenter htMiddle'};
+  colWidth[i] = 60;
+  col2[i] = 60;
+  if(i == 0 || ((i > 11) && ((i-9) % 11 == 0))){
     colOption[i] = {type: 'checkbox', className: 'htCenter htMiddle'};
+    colWidth[i] = 30;
+    col2[i] = 30;
   }
-  if(i == 2 || i == 3 || i == 7 || i == 15 || i == 20){
+
+  if(i == 1 || i == 2 || i == 6 || i == 7 || i == 15 || ((i > 11) && ((i-21) % 11 == 0) || ((i-21) % 11 == 1)) ){
     colOption[i] = {renderer: 'html', className: 'htCenter htMiddle'};
   }
-  if(i == 4 || i == 5 || i == 6 || i == 10 || i == 11 ||i == 13 ||i == 17 ||i == 18 ||i == 23 ||i == 24 ||i == 26 ||i == 27){
-    colOption[i] = {className: 'htCenter htMiddle'};
-  }
+
 }
+colWidth[1] = 80;
+colWidth[2] = 80;
+colWidth[14] = 20;
+colWidth[19] = 20;
+
+col2[1] = 80;
+col2[2] = 80;
+col2[14] = 20;
+col2[19] = 20;
+
+col2[6] = 1;
+col2[7] = 1;
+col2[8] = 1;
+col2[9] = 1;
+col2[12] = 1;
+col2[13] = 1;
+col2[14] = 1;
+col2[15] = 1;
+col2[16] = 1;
 
 var container = document.getElementById('result');
 var handsontable = new Handsontable(container, {
@@ -47,7 +86,7 @@ var handsontable = new Handsontable(container, {
   fixedColumnsLeft: 7,
   manualColumnResize: true,
   autoColumnSize: false,
-  colWidths:[40,40,90,90,80,80,80,80,120,80,80,80,80,80,20,90,90,80,80,5,80,120,80,80,80,80,80,80,40,40,40,40,40,40],
+  colWidths: colWidth,
   rowHeights:70,
   className: "htMiddle",
   columns: colOption
@@ -58,14 +97,16 @@ $("#hide").click(function () {
     document.getElementById("hide").innerText = "表示";
     document.getElementById("hide").className = "btn btn-warning";
     handsontable.updateSettings({
-      colWidths:[20,20,90,90,80,80,80,1,1,1,80,80,1,1,1,60,1,80,80,1,1,1,1,80,80,80,80,80,1,1,1,1,1,1]
+      colWidths:col2,
+      fixedColumnsLeft: 20
     });
     handsontable.render();
   }else{
     document.getElementById("hide").innerText = "非表示";
     document.getElementById("hide").className = "btn btn-primary";
     handsontable.updateSettings({
-      colWidths:[40,40,90,90,80,80,80,80,120,80,80,80,80,80,20,90,90,80,80,5,80,120,80,80,80,80,80,80,40,40,40,40,40,40]
+      colWidths:colWidth,
+      fixedColumnsLeft: 7
     });
     handsontable.render();
   }
@@ -80,7 +121,6 @@ $("#submit_url").click(function () {
     document.getElementById("submit_url").innerText = "中断";
     document.getElementById("submit_url").className = "btn btn-warning";
     document.getElementById("progress").value = "continue";
-    handsontable.loadData(mydata);
     repajax(url,pgnum,cnum);
   }else{
     document.getElementById("submit_url").innerText = "アマゾン取得";
@@ -170,6 +210,9 @@ function repajax(url,pgnum,cnum){
 
     },
     error: function (resData) {
+      alert("終了");
+      document.getElementById("submit_url").innerText = "アマゾン取得";
+      document.getElementById("submit_url").className = "btn btn-primary";
       return false;
     }
   });
@@ -179,7 +222,7 @@ function repajax(url,pgnum,cnum){
 $("#connet_yahoo").click(function () {
 
   if(document.getElementById("connet_yahoo").innerText == "ヤフオク取得"){
-
+    /*
     var org = handsontable.getData();
     for(var i = 0; i < org.length; i++){
       for(var j = 0; j < org[i].length; j++){
@@ -194,7 +237,7 @@ $("#connet_yahoo").click(function () {
 
     handsontable.loadData(org);
     handsontable.render();
-
+    */
     alert("ヤフオクから情報を取得します");
     document.getElementById("connet_yahoo").innerText = "中断";
     document.getElementById("connet_yahoo").className = "btn btn-warning";
@@ -251,10 +294,11 @@ function ConnectYahoo(rownum){
         sprice = 0;
         profit = 0;
       }
-
-      nData[j] = [rownum,4,String(sprice)];
-      nData[j+1] = [rownum,5,String(profit)];
-      nData[j+2] = [rownum,6,String(bp)];
+      /*
+      nData[j] = [rownum,3,String(sprice)];
+      nData[j+1] = [rownum,4,String(profit)];
+      nData[j+2] = [rownum,5,String(bp)];
+      */
       handsontable.setDataAtCell(nData);
 
       sr++;
@@ -329,9 +373,9 @@ function ReloadYahoo(rownum){
 
       var amafee = rData[rownum][13];
       var sprice = usedprice - 10;
-      var bp = resData[4];
+      var bp = resData[3];
       if(bp == 0){
-        bp = resData[3];
+        bp = resData[2];
       }
       var profit = Math.round(sprice * (100 - amafee) / 100) - bp;
       nData[0] = [rownum,3,resData[0]];
@@ -345,9 +389,9 @@ function ReloadYahoo(rownum){
         profit = 0;
       }
 
-      nData[j] = [rownum,4,String(sprice)];
-      nData[j+1] = [rownum,5,String(profit)];
-      nData[j+2] = [rownum,6,String(bp)];
+      nData[j] = [rownum,3,String(sprice)];
+      nData[j+1] = [rownum,4,String(profit)];
+      nData[j+2] = [rownum,5,String(bp)];
       handsontable.setDataAtCell(nData);
 
       rownum++;
@@ -545,25 +589,27 @@ $("#setcsv").click(function () {
       for(var k = 0; k < col; k++){
         csvdata[3+j][k] = fixeddata[3][k];
       }
+      var tcol = 0;
 
-      var sellprice = orgdata[i][4];
-      var point = 0.01;
-      var ampoint = Math.round(sellprice * point);
+      var q = 0;
+      for(var p = 0; p < 20; p++){
+        if(orgdata[i][20 + p*11] == true){
+          tcol = 20 + p*11;
+        }
+      }
+
+      var sellprice = orgdata[i][3];
+      var sku = orgdata[i][tcol+4];
+      //var point = 0.01;
+      //var ampoint = Math.round(sellprice * point);
       var quantity = 1;
 
-      csvdata[3+j][0] = orgdata[i][22];
+      csvdata[3+j][0] = sku;
       csvdata[3+j][1] = sellprice;
-      csvdata[3+j][2] = ampoint;
+      //csvdata[3+j][2] = ampoint;
       csvdata[3+j][3] = quantity;
       csvdata[3+j][4] = orgdata[i][9];
       csvdata[3+j][5] = "ASIN";
-
-      csvdata[3+j][21] = orgdata[i][28];
-      csvdata[3+j][22] = orgdata[i][29];
-      csvdata[3+j][23] = orgdata[i][30];
-      csvdata[3+j][24] = orgdata[i][31];
-      csvdata[3+j][25] = orgdata[i][32];
-
       j++;
     }
   }
@@ -737,6 +783,69 @@ $("#set_asin_btn").click(function () {
     }
   });
 });
+
+//出品候補にチェックが入った場合
+Handsontable.hooks.add('afterChange', function() {
+  var res = arguments[0][0];
+  var row = res[0];
+  var col = res[1];
+  var bf = res[2];
+  var af = res[3];
+  if(((col > 11) && ((col - 9) % 11 == 0))){
+    if(af == true){
+      var na = [];
+      var sp = 0;
+      var pf = 0;
+      var by = 0;
+
+      var d = handsontable.getDataAtRow(row);
+      var cp = d[col + 5];
+      var bp = d[col + 6];
+      var f = d[13]/100;
+      sp = d[10];
+      if(bp != '-'){
+        by = bp;
+      }else{
+        by = cp;
+      }
+      pf = sp * (1-f) - by;
+      na[0] = [];
+      na[0][0] = row;
+      na[0][1] = 3;
+      na[0][2] = sp;
+      na[1] = [];
+      na[1][0] = row;
+      na[1][1] = 4;
+      na[1][2] = pf;
+      na[2] = [];
+      na[2][0] = row;
+      na[2][1] = 5;
+      na[2][2] = by;
+      na[3] = [];
+      na[3][0] = row;
+      na[3][1] = 2;
+      na[3][2] = d[col+2];
+
+      var nb = [];
+      var q = 0;
+      for(var p = 0; p < 20; p++){
+        if((20 + p*11) != col){
+          nb[q] = [];
+          nb[q][0] = row;
+          nb[q][1] = 20 + p*11;
+          nb[q][2] = false;
+          q++;
+        }
+      }
+
+      handsontable.setDataAtCell(na);
+      handsontable.setDataAtCell(nb);
+      handsontable.render();
+
+    }
+  }
+  handsontable.render();
+}, handsontable);
 
 
 function sleep(time, callback){

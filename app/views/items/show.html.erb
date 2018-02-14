@@ -55,6 +55,7 @@
           <button id="connet_yahoo" class="btn btn-primary" type="button" style="width: 120px;">ヤフオク取得</button>
         </div>
         &nbsp;
+        <!---
         <div class="form-group">
           <% if @account_level != true then  %>
             <button id="reload_yahoo" class="btn btn-primary" type="button" style="width: 120px;">データの更新</button>
@@ -63,6 +64,7 @@
           <% end %>
         </div>
         &nbsp;
+        /-->
         <div class="form-group">
           <% if @account_level != true then  %>
             <button id="setcsv" class="btn btn-primary" type="button" style="width: 100px;">CSV作成</button>
@@ -111,7 +113,7 @@
       <% else %>
         <button id="fixed_save" class="btn btn-primary" type="button" style="width: 140px;" disabled>CSV設定保存</button>
       <% end %>
-      
+
       <br><br>
       <div id="fixed_csv"></div>
     </div>
