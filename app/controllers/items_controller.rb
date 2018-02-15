@@ -157,6 +157,7 @@ class ItemsController < ApplicationController
             end
             data[j][0] = false
             data[j][1] = false
+            data[j][6] = '<a href="http://mnrate.com/item/aid/' + reg_asin[j][0] + '" target="_blank">' + 'http://mnrate.com/item/aid/' + reg_asin[j][0] + '</a>'
             data[j][9] = list.value
             data[j][14] = "⇒"
             j += 1

@@ -114,6 +114,16 @@ $("#hide").click(function () {
 
 $("#submit_url").click(function () {
   Handsontable.hooks.destroy(handsontable);
+
+  Handsontable.hooks.add('afterSelectionEnd', function() {
+    var data = handsontable.getValue();
+    var res = [];
+    res[0] = [];
+    res[0][0] = data;
+    selected_handsontable.loadData(res);
+    selected_handsontable.render();
+  }, handsontable);
+
   if(document.getElementById("submit_url").innerText == "アマゾン取得"){
     alert("アマゾンの情報取得を開始します");
     var url = document.getElementById("input_url").value;
@@ -221,6 +231,15 @@ function repajax(url,pgnum,cnum){
 
 $("#connet_yahoo").click(function () {
   Handsontable.hooks.destroy(handsontable);
+  Handsontable.hooks.add('afterSelectionEnd', function() {
+    var data = handsontable.getValue();
+    var res = [];
+    res[0] = [];
+    res[0][0] = data;
+    selected_handsontable.loadData(res);
+    selected_handsontable.render();
+  }, handsontable);
+  
   if(document.getElementById("connet_yahoo").innerText == "ヤフオク取得"){
     alert("ヤフオクから情報を取得します");
     document.getElementById("connet_yahoo").innerText = "中断";
@@ -291,15 +310,14 @@ function ConnectYahoo(rownum){
           na[3][0] = row;
           na[3][1] = 2;
           na[3][2] = d[col+2];
-          console.log(d[col+2]);
 
           var q = 0;
           for(var p = 0; p < 20; p++){
             if((20 + p*11) != col){
-              na[q+3] = [];
-              na[q+3][0] = row;
-              na[q+3][1] = 20 + p*11;
-              na[q+3][2] = false;
+              na[q+4] = [];
+              na[q+4][0] = row;
+              na[q+4][1] = 20 + p*11;
+              na[q+4][2] = false;
               q++;
             }
           }
@@ -378,8 +396,7 @@ function ConnectYahoo(rownum){
               var bp = d[col + 6];
               var f = d[13]/100;
               sp = d[10];
-              console.log(cp);
-              console.log(bp);
+
               if(bp != 0){
                 by = bp;
               }else{
@@ -408,10 +425,10 @@ function ConnectYahoo(rownum){
               var q = 0;
               for(var p = 0; p < 20; p++){
                 if((20 + p*11) != col){
-                  na[q+3] = [];
-                  na[q+3][0] = row;
-                  na[q+3][1] = 20 + p*11;
-                  na[q+3][2] = false;
+                  na[q+4] = [];
+                  na[q+4][0] = row;
+                  na[q+4][1] = 20 + p*11;
+                  na[q+4][2] = false;
                   q++;
                 }
               }
