@@ -349,7 +349,7 @@ class ItemsController < ApplicationController
     current_email = current_user.email
 
     user = current_user.email
-    if User.find_by(user: user).access_flg != true then
+    if User.find_by(email: user).access_flg != true then
       redirect_to items_show_path
     end
 
