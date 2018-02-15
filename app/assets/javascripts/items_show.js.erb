@@ -36,8 +36,8 @@ for(var i = 0; i < maxRownum; i++){
 
 for(var i = 0; i < maxColnum; i++){
   colOption[i] = {className: 'htCenter htMiddle'};
-  colWidth[i] = 60;
-  col2[i] = 60;
+  colWidth[i] = 55;
+  col2[i] = 55;
   if(i == 0 || ((i > 11) && ((i-9) % 11 == 0))){
     colOption[i] = {type: 'checkbox', className: 'htCenter htMiddle'};
     colWidth[i] = 30;
@@ -46,18 +46,24 @@ for(var i = 0; i < maxColnum; i++){
 
   if(i == 1 || i == 2 || i == 6 || i == 7 || i == 15 || ((i > 11) && ((i-21) % 11 == 0) || ((i-21) % 11 == 1)) ){
     colOption[i] = {renderer: 'html', className: 'htCenter htMiddle'};
+    if((i > 11) && ((i-21) % 11 == 1)){
+      colWidth[i] = 80;
+      col2[i] = 80;
+    }
+
+
   }
 
 }
 colWidth[1] = 80;
 colWidth[2] = 80;
 colWidth[14] = 20;
-colWidth[19] = 20;
+colWidth[19] = 5;
 
 col2[1] = 80;
 col2[2] = 80;
 col2[14] = 20;
-col2[19] = 20;
+col2[19] = 5;
 
 col2[6] = 1;
 col2[7] = 1;
@@ -351,6 +357,7 @@ function ConnectYahoo(rownum){
             }
           }
           handsontable.setDataAtCell(na);
+        }
       }
       handsontable.render();
     }, handsontable);
