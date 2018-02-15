@@ -347,85 +347,64 @@ class ItemsController < ApplicationController
     logger.debug("\n\n\n")
     logger.debug("Debug Start!")
     current_email = current_user.email
-
     user = current_user.email
-    if User.find_by(email: user).access_flg != true then
-      redirect_to items_show_path
-    end
 
-    user= Mws.find_by(user:current_email)
-    saws = ENV["AWS_ACCESS_KEY_ID"]
-    skey = ENV["AWS_SECRET_ACCESS_KEY"]
-    sid = user.SellerId
-    token = user.AWSkey
-    res = params[:data]
+    if User.find_by(email: user).trial_flg == true then
+      #redirect_to items_show_path
+      res = ["trial"]
+      logger.debug("trial")
+      render json: res
+    else
+      cuser = Mws.find_by(user:current_email)
+      saws = ENV["AWS_ACCESS_KEY_ID"]
+      skey = ENV["AWS_SECRET_ACCESS_KEY"]
+      sid = cuser.SellerId
+      token = cuser.AWSkey
+      res = params[:data]
 
-    client = MWS.feeds(
-      primary_marketplace_id: "A1VC38T7YXB528",
-      merchant_id: seller,
-      aws_access_key_id: aws,
-      aws_secret_access_key: skey,
-      auth_token: token
-    )
+      client = MWS.feeds(
+        primary_marketplace_id: "A1VC38T7YXB528",
+        merchant_id: sid,
+        aws_access_key_id: saws,
+        aws_secret_access_key: skey,
+        auth_token: token
+      )
 
-    res1 = JSON.parse(res)
+      res1 = JSON.parse(res)
 
-    logger.debug("Pre Feed Content is \n\n")
+      logger.debug("Pre Feed Content is \n\n")
 
-    kk = 0
-    feed_body = ""
-    while kk < res1.length
-      feed_body = feed_body + res1[kk].join("\t")
-      feed_body = feed_body + "\n"
-      kk += 1
-    end
-
-    mappings = {
-      "\u{00A2}" => "\u{FFE0}",
-      "\u{00A3}" => "\u{FFE1}",
-      "\u{00AC}" => "\u{FFE2}",
-      "\u{2016}" => "\u{2225}",
-      "\u{2012}" => "\u{FF0D}",
-      "\u{301C}" => "\u{FF5E}"
-    }
-
-    mappings.each{|before, after| feed_body = feed_body.gsub(before, after) }
-    new_body = feed_body.encode(Encoding::Windows_31J, undef: :replace)
-
-    logger.debug("Feed Content is \n\n")
-    logger.debug(new_body)
-
-    feed_type = "_POST_FLAT_FILE_LISTINGS_DATA_"
-    parser = client.submit_feed(new_body, feed_type)
-    doc = Nokogiri::XML(parser.body)
-
-    submissionId = doc.xpath(".//mws:FeedSubmissionId", {"mws"=>"http://mws.amazonaws.com/doc/2009-01-01/"}).text
-=begin
-    process = ""
-    err = 0
-    while process != "_DONE_" do
-      sleep(25)
-      list = {feed_submission_id_list: submissionId}
-      parser = client.get_feed_submission_list(list)
-      doc = Nokogiri::XML(parser.body)
-      process = doc.xpath(".//mws:FeedProcessingStatus", {"mws"=>"http://mws.amazonaws.com/doc/2009-01-01/"}).text
-      logger.debug(doc)
-      err += 1
-      if err > 1 then
-        break
+      kk = 0
+      feed_body = ""
+      while kk < res1.length
+        feed_body = feed_body + res1[kk].join("\t")
+        feed_body = feed_body + "\n"
+        kk += 1
       end
+
+      mappings = {
+        "\u{00A2}" => "\u{FFE0}",
+        "\u{00A3}" => "\u{FFE1}",
+        "\u{00AC}" => "\u{FFE2}",
+        "\u{2016}" => "\u{2225}",
+        "\u{2012}" => "\u{FF0D}",
+        "\u{301C}" => "\u{FF5E}"
+      }
+
+      mappings.each{|before, after| feed_body = feed_body.gsub(before, after) }
+      new_body = feed_body.encode(Encoding::Windows_31J, undef: :replace)
+
+      logger.debug("Feed Content is \n\n")
+      logger.debug(new_body)
+
+      feed_type = "_POST_FLAT_FILE_LISTINGS_DATA_"
+      parser = client.submit_feed(new_body, feed_type)
+      doc = Nokogiri::XML(parser.body)
+
+      submissionId = doc.xpath(".//mws:FeedSubmissionId", {"mws"=>"http://mws.amazonaws.com/doc/2009-01-01/"}).text
+      res = ["test"]
+      render json: res
     end
-
-
-    parser = client.get_feed_submission_result(submissionId)
-    doc = Nokogiri::XML(parser.body)
-    logger.debug(doc)
-    logger.debug("\n\n")
-    #submissionId = doc.match(/FeedSubmissionId>([\s\S]*?)<\/Feed/)[1]
-    #parser.parse # will return a Hash object
-=end
-    res = ["test"]
-    render json: res
   end
 
 

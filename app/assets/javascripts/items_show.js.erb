@@ -847,7 +847,12 @@ $("#upload").click(function () {
     data: myData,
     dataType: 'json',
     success: function (myData) {
-      alert("アップロード受け付けました");
+      if(myData[0] == "trial"){
+        alert("試用版のため中断します");
+      }else{
+        alert("アップロード受け付けました");
+      }
+
     },
     error: function (myData) {
       //alert("NG");
