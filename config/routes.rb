@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
 
   get 'manager/edit'
+  post 'manager/edit'
 
   root to: 'items#show'
 
