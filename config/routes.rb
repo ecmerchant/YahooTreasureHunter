@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  get 'manager/edit'
+
   root to: 'items#show'
 
   get 'items/show'
@@ -9,6 +11,8 @@ Rails.application.routes.draw do
 
   get 'items/setup'
   post 'items/setup'
+
+  post 'items/newuser'
 
   post 'items/upload'
 

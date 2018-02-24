@@ -343,6 +343,16 @@ class ItemsController < ApplicationController
     render json: data
   end
 
+  def newuser
+    user = params[:email]
+    pass = params[:password]
+    User.create(
+      email: user,
+      password: pass,
+      trial_flg: true
+    )
+  end
+
   def upload
     logger.debug("\n\n\n")
     logger.debug("Debug Start!")
