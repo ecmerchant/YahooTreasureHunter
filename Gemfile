@@ -78,3 +78,4 @@ gem 'jquery-turbolinks'
 # for job with Resque
 gem 'redis-rails'
 gem 'resque'
+gem "typhoeus"
