@@ -16,7 +16,8 @@ class ManagerController < ApplicationController
       pass = params[:password]
       us = User.find_or_initialize_by(email: user)
       us.update(
-        password: pass
+        password: pass,
+        trial_flg: false
       )
     end
 
