@@ -195,7 +195,7 @@ function repajax(url,pgnum,cnum){
     dataType: 'json',
     success: function (resData) {
       if(resData == ""){
-        alert("終了しました");
+        alert("終了しました!");
         document.getElementById("submit_url").innerText = "アマゾン取得";
         document.getElementById("submit_url").className = "btn btn-primary";
         return;

@@ -166,9 +166,18 @@ class ItemsController < ApplicationController
         end
       end
     else
-      j = 0
+      pp = (pgnum.to_i-1)*20
+      dd = (pgnum.to_i)*20
+      if dd > reg_asin.length then
+        dd = reg_asin.length - (pgnum.to_i - 1)*20
+      else
+        dd = 20
+      end
       data = []
-      for j in 0..reg_asin.length - 1
+      logger.debug("<<<<<<<<<<<<")
+      logger.debug(pp)
+      logger.debug(dd)
+      for j in 0..dd-1
         if reg_asin[j][0] == nil then
           break
         end
@@ -179,9 +188,9 @@ class ItemsController < ApplicationController
         data[j][0] = false
         data[j][6] = '<a href="http://mnrate.com/item/aid/' + reg_asin[j][0] + '" target="_blank">' + 'http://mnrate.com/item/aid/' + reg_asin[j][0] + '</a>'
 
-        data[j][9] = reg_asin[j][0]
+        data[j][9] = reg_asin[pp+j][0]
         data[j][14] = "⇒"
-        j += 1
+        #j += 1
       end
     end
 
@@ -219,7 +228,8 @@ class ItemsController < ApplicationController
     k = 0
     m = 0
     counter = 0
-
+    logger.debug("Check data\n")
+    logger.debug(data)
     for ta in data
       asin[i] = ta[9]
       asin_s[j] = ta[9]
