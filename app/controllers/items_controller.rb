@@ -254,6 +254,7 @@ class ItemsController < ApplicationController
       counter += 1
 
       if j == 5 || counter == data.length then
+        logger.debug("==========")
         logger.debug(asin_s)
         parser3 = client.get_matching_product_for_id(id_type, asin_s)
         doc3 = Nokogiri::XML(parser3.body)
