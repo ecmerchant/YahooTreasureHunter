@@ -44,17 +44,22 @@ for(var i = 0; i < maxColnum; i++){
     col2[i] = 30;
   }
 
+  if(((i > 19) && ((i-9) % 11 == 5)) || ((i > 19) && ((i-9) % 11 == 6))){
+    colOption[i] = {className: 'htCenter htMiddle tPrice'};
+    colWidth[i] = 55;
+    col2[i] = 55;
+  }
+
+
   if(i == 1 || i == 2 || i == 6 || i == 7 || i == 15 || ((i > 11) && ((i-21) % 11 == 0) || ((i-21) % 11 == 1)) ){
     colOption[i] = {renderer: 'html', className: 'htCenter htMiddle'};
     if((i > 11) && ((i-21) % 11 == 1)){
       colWidth[i] = 80;
       col2[i] = 80;
     }
-
-
   }
-
 }
+
 colWidth[1] = 80;
 colWidth[2] = 80;
 colWidth[14] = 20;
@@ -223,7 +228,6 @@ function repajax(url,pgnum,cnum){
         pgnum++;
         sleep(500,repajax(url,pgnum,cnum));
       }
-
     },
     error: function (resData) {
       alert("終了");
@@ -357,6 +361,7 @@ function ConnectYahoo(rownum){
             }
           }
           handsontable.setDataAtCell(na);
+
         }
       }
       handsontable.render();
@@ -410,11 +415,70 @@ function ConnectYahoo(rownum){
         document.getElementById("connet_yahoo").className = "btn btn-primary";
         document.getElementById("progress").value = "cancel";
 
-        ////
+        //データ取得後
+        for(var gg = 0; gg < lp; gg++){
+          var col = 20;
+          var row = gg;
+
+          var na = [];
+          var sp = 0;
+          var pf = 0;
+          var by = 0;
+
+          var d = handsontable.getDataAtRow(row);
+          var cp = d[col + 5];
+          var bp = d[col + 6];
+          var f = d[13]/100;
+          sp = d[10];
+
+          if(bp != 0){
+            by = bp;
+          }else{
+            by = cp;
+          }
+
+          if(by != 0 && by < sp * 0.60){
+            pf = Math.round(sp * (1-f) - by);
+            na[0] = [];
+            na[0][0] = row;
+            na[0][1] = 3;
+            na[0][2] = sp;
+            na[1] = [];
+            na[1][0] = row;
+            na[1][1] = 4;
+            na[1][2] = pf;
+            na[2] = [];
+            na[2][0] = row;
+            na[2][1] = 5;
+            na[2][2] = by;
+            na[3] = [];
+            na[3][0] = row;
+            na[3][1] = 2;
+            na[3][2] = d[col+2];
+            console.log(d[col+2]);
+
+            var q = 0;
+            for(var p = 0; p < 20; p++){
+              if((20 + p*11) != col){
+                na[q+4] = [];
+                na[q+4][0] = row;
+                na[q+4][1] = 20 + p*11;
+                na[q+4][2] = false;
+                q++;
+              }
+            }
+            handsontable.setDataAtCell(na);
+            if(by < sp * 0.60){
+              handsontable.setCellMeta(row, 4, 'className', 'htCenter htMiddle tProfit');
+            }
+          }
+        }
+
+        //////
+
         Handsontable.hooks.add('afterChange', function() {
 
           var res = arguments[0][0];
-
           var row = res[0];
           var col = res[1];
           var bf = res[2];
@@ -981,7 +1045,6 @@ $("#set_asin_btn").click(function () {
     }
   });
 });
-
 
 function sleep(time, callback){
   setTimeout(callback, time);

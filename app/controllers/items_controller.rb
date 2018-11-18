@@ -696,7 +696,11 @@ class ItemsController < ApplicationController
         end
         aucid = furl.match(/auction\/([\s\S]*?)$/)[1]
         furl = MkURL(furl)
-        result.push("false")
+        if p == 0 then
+          result.push("true")
+        else
+          result.push("false")
+        end        
         result.push(furl)
         result.push(image)
         result.push(title)
