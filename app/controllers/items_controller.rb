@@ -186,7 +186,7 @@ class ItemsController < ApplicationController
           data[j][x] = ""
         end
         data[j][0] = false
-        data[j][6] = '<a href="http://mnrate.com/item/aid/' + reg_asin[j][0] + '" target="_blank">' + 'http://mnrate.com/item/aid/' + reg_asin[j][0] + '</a>'
+        data[j][6] = '<a href="http://mnrate.com/item/aid/' + reg_asin[pp+j][0] + '" target="_blank">' + 'http://mnrate.com/item/aid/' + reg_asin[pp+j][0] + '</a>'
 
         data[j][9] = reg_asin[pp+j][0]
         data[j][14] = "⇒"
@@ -700,7 +700,7 @@ class ItemsController < ApplicationController
           result.push("true")
         else
           result.push("false")
-        end        
+        end
         result.push(furl)
         result.push(image)
         result.push(title)
