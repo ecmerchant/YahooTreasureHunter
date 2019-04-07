@@ -567,6 +567,7 @@ class ItemsController < ApplicationController
     ua = CSV.read('app/others/User-Agent.csv', headers: false, col_sep: "\t")
     uanum = ua.length
     user_agent = ua[rand(uanum)][0]
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100"
     logger.debug("\n\nagent is ")
     logger.debug(user_agent)
 
@@ -637,72 +638,82 @@ class ItemsController < ApplicationController
     doc = Nokogiri::HTML.parse(html, nil, charset)
 
     #ヒットした商品を抜出
-    item_num = doc.xpath('//td[@class="i"]').count
+    temp = doc.xpath('//li[@class="Product"]')
+    item_num = temp.count
     logger.debug("item num is")
     logger.debug(item_num)
-    temp = doc.xpath('//td[@class="i"]')
 
     if item_num > 20 then
       item_num = 20
     end
 
     if item_num > 0 then
-      for p in 0..item_num-1
-        furl = doc.xpath('//td[@class="a1"]')[p].css('a')[0][:href]
-        title = doc.xpath('//td[@class="a1"]')[p].xpath('.//h3')[0].inner_text
-        image = temp[p].css('img')[0][:src]
+      temp.each_with_index do |hit, index|
+        if index > 19 then
+          break
+        end
+        logger.debug(hit)
+        furl = hit.xpath('.//h3[@class="Product__title"]')[0][:href]
+        title = hit.xpath('.//h3[@class="Product__title"]/a')[0].inner_text
+        rest = hit.xpath('.//span[@class="Product__time"]')[0].inner_text
+        logger.debug(title)
+
+        bid = hit.xpath('.//a[@class="Product__bid"]')[0].inner_text
+        image = hit.xpath('.//img[@class="Product__imageData"]')[0][:src]
         image = '<img src="' + image + '" width="80" height="60">'
+        prices = hit.xpath('.//span[@class="Product__price"]')
+        logger.debug(prices.length)
+        if prices.length > 1 then
 
-        bitnum = doc.xpath('//td[@class="bi"]')[p].inner_text
-        rest = doc.xpath('//td[@class="ti"]')[p].inner_text
+          cprice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
+          if cprice != nil then
+            cprice = cprice[1]
+            cprice = cprice.gsub(",", "")
+          else
+            cprice = 0
+          end
 
-        cPrice = doc.xpath('//td[@class="pr1"]')[p].inner_html
-        bPrice = doc.xpath('//td[@class="pr2"]')[p].inner_html
+          bPrice = /Product__priceValue">([\s\S]*?)円/.match(prices[1].inner_html)
+          if bPrice != nil then
+            bPrice = bPrice[1]
+            bPrice = bPrice.gsub(",", "")
+          else
+            bPrice = 0
+          end
 
-        if cPrice.index("span") == nil then
-          cPrice = doc.xpath('//td[@class="pr1"]')[p].xpath('./text()')[0]
         else
-          cPrice = doc.xpath('//td[@class="pr1"]')[p].xpath('./span/text()')[0]
-        end
+          tlabel = prices[0].xpath('./span[@class="Produce__label"]')[0].inner_text
+          if tlabel == "現在" then
+            cprice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
+            if cprice != nil then
+              cprice = cprice[1]
+              cprice = cprice.gsub(",", "")
+            else
+              cprice = 0
+            end
 
-        if bPrice.index("span") == nil then
-          bPrice = doc.xpath('//td[@class="pr2"]')[p].xpath('./text()')[0]
-        else
-          bPrice = doc.xpath('//td[@class="pr2"]')[p].xpath('./span/text()')[0]
-        end
+            bprice = 0
+          else
+            bprice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
+            if bPrice != nil then
+              bPrice = bPrice[1]
+              bPrice = bPrice.gsub(",", "")
+            else
+              bPrice = 0
+            end
 
-        if cPrice != nil then
-          cPrice = cPrice.inner_text
-          cPrice = CCur(cPrice)
-        else
-          cPrice = 0
-        end
-
-        if bPrice != nil then
-          bPrice = bPrice.inner_text
-          bPrice = CCur(bPrice)
-        else
-          bPrice = 0
-        end
-
-        condition = "中古"
-        if doc.xpath('//td[@class="a1"]')[p].xpath('.//li[@class="cic1"]').count > 0 then
-          condition = "新品"
-        end
-
-        rank = ""
-        if doc.xpath('//div[@class="a4 cf"]')[p].xpath('.//span[@class="icMasSil"]').count > 0 then
-          rank = "シルバー"
-        end
-        if doc.xpath('//div[@class="a4 cf"]')[p].xpath('.//span[@class="icMasGld"]').count > 0 then
-          rank = "ゴールド"
-        end
-        if doc.xpath('//div[@class="a4 cf"]')[p].xpath('.//span[@class="icMasDia"]').count > 0 then
-          rank = "ダイヤモンド"
+            cprice = 0
+          end
         end
         aucid = furl.match(/auction\/([\s\S]*?)$/)[1]
-        furl = MkURL(furl)
-        if p == 0 then
+
+        condition = "中古"
+        if hit.inner_html.include?("新品") then
+          condition = "新品"
+        end
+        rank = ""
+
+        if index == 0 then
           result.push("true")
         else
           result.push("false")
@@ -711,12 +722,13 @@ class ItemsController < ApplicationController
         result.push(image)
         result.push(title)
         result.push(aucid)
-        result.push(cPrice)
-        result.push(bPrice)
-        result.push(bitnum)
+        result.push(cprice)
+        result.push(bprice)
+        result.push(bid)
         result.push(rest)
         result.push(condition)
         result.push(rank)
+
       end
     else
       furl = ""
@@ -739,9 +751,9 @@ class ItemsController < ApplicationController
       result.push("")
       result.push(condition)
       result.push(rank)
-
     end
 
+    logger.debug(title)
     if surl != nil && surl != "" then
       surl = '<a href="' + surl + '" target="_blank">' + surl + '</a>'
     end
