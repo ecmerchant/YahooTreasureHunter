@@ -655,7 +655,12 @@ class ItemsController < ApplicationController
         logger.debug(hit)
         furl = hit.xpath('.//h3[@class="Product__title"]')[0][:href]
         title = hit.xpath('.//h3[@class="Product__title"]/a')[0].inner_text
-        rest = hit.xpath('.//span[@class="Product__time"]')[0].inner_text
+        rest = hit.xpath('.//span[@class="Product__time"]')[0]
+        if rest != nil then
+          rest = rest.inner_text
+        else
+          rest = hit.xpath('.//span[@class="Product__time u-textRed"]')[0].inner_text
+        end
         logger.debug(title)
 
         bid = hit.xpath('.//a[@class="Product__bid"]')[0].inner_text
