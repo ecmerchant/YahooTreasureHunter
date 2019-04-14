@@ -127,9 +127,11 @@ class ItemsController < ApplicationController
 
       url = org_url + '&page=' + pgnum.to_s
       logger.debug(url)
-      user_agent = "Mozilla/5.0 (Windows NT 6.1; rv:28.0) Gecko/20100101 Firefox/28.0"
 
-
+      ua = CSV.read('app/others/User-Agent.csv', headers: false, col_sep: "\t")
+      uanum = ua.length
+      user_agent = ua[rand(uanum)][0]
+    
       begin
         html = open(url, "User-Agent" => user_agent) do |f|
           charset = f.charset
@@ -567,7 +569,7 @@ class ItemsController < ApplicationController
     ua = CSV.read('app/others/User-Agent.csv', headers: false, col_sep: "\t")
     uanum = ua.length
     user_agent = ua[rand(uanum)][0]
-    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100"
+
     logger.debug("\n\nagent is ")
     logger.debug(user_agent)
 
