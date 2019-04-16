@@ -607,11 +607,11 @@ class ItemsController < ApplicationController
       minPrice = 0
     end
     
-    surl = '<a href="' + surl.to_s + '" target="_blank">' + surl.to_s + '</a>'
+    surl2 = '<a href="' + surl.to_s + '" target="_blank">' + surl.to_s + '</a>'
       
     result = [
       "",
-      surl,
+      surl2,
       keyword,
       maxPrice,
       avgPrice,
@@ -730,9 +730,9 @@ class ItemsController < ApplicationController
           result.push("false")
         end
         
-        furl = '<a href="' + furl.to_s + '" target="_blank">' + furl.to_s + '</a>'
+        furl2 = '<a href="' + furl.to_s + '" target="_blank">' + furl.to_s + '</a>'
         
-        result.push(furl)
+        result.push(furl2)
         result.push(image)
         result.push(title)
         result.push(aucid)
