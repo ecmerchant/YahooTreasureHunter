@@ -655,7 +655,7 @@ class ItemsController < ApplicationController
           break
         end
         logger.debug(hit)
-        furl = hit.xpath('.//h3[@class="Product__title"]')[0][:href]
+        furl = hit.xpath('.//h3[@class="Product__title"]/a')[0][:href]
         title = hit.xpath('.//h3[@class="Product__title"]/a')[0].inner_text
         rest = hit.xpath('.//span[@class="Product__time"]')[0]
         if rest != nil then
