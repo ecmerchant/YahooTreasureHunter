@@ -570,7 +570,7 @@ class ItemsController < ApplicationController
     uanum = ua.length
     user_agent = ua[rand(uanum)][0]
 
-    logger.debug("\n\nagent is ")
+    logger.debug("====== UserAgent END Item =======")
     logger.debug(user_agent)
 
     begin
@@ -621,7 +621,7 @@ class ItemsController < ApplicationController
     ua = CSV.read('app/others/User-Agent.csv', headers: false, col_sep: "\t")
     uanum = ua.length
     user_agent = ua[rand(uanum)][0]
-    logger.debug("\n\nagent is ")
+    logger.debug("====== User Agent OPEN Item =======")
     logger.debug(user_agent)
     surl = surl + "&s1=end&o1=a" #並び順を終了時間でソート
     logger.debug(surl)
@@ -655,8 +655,10 @@ class ItemsController < ApplicationController
           break
         end
         logger.debug(hit)
-        furl = hit.xpath('.//h3[@class="Product__title"]/a')[0][:href]
-        title = hit.xpath('.//h3[@class="Product__title"]/a')[0].inner_text
+        furl = hit.xpath('.//h3')[0][:href]
+        title = hit.xpath('.//h3/a')[0].inner_text
+        #furl = hit.xpath('.//h3[@class="Product__title"]/a')[0][:href]
+        #title = hit.xpath('.//h3[@class="Product__title"]/a')[0].inner_text
         rest = hit.xpath('.//span[@class="Product__time"]')[0]
         if rest != nil then
           rest = rest.inner_text
