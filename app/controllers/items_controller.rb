@@ -606,7 +606,9 @@ class ItemsController < ApplicationController
       maxPrice = 0
       minPrice = 0
     end
-
+    
+    surl = '<a href="' + surl.to_s + '" target="_blank">' + surl.to_s + '</a>'
+      
     result = [
       "",
       surl,
@@ -727,6 +729,9 @@ class ItemsController < ApplicationController
         else
           result.push("false")
         end
+        
+        furl = '<a href="' + furl.to_s + '" target="_blank">' + furl.to_s + '</a>'
+        
         result.push(furl)
         result.push(image)
         result.push(title)
