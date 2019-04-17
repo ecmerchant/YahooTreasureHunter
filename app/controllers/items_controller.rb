@@ -507,7 +507,7 @@ class ItemsController < ApplicationController
     end
 
     #利益などの計算
-
+    
     result = [
       image,
       furl,
@@ -736,8 +736,8 @@ class ItemsController < ApplicationController
         result.push(image)
         result.push(title)
         result.push(aucid)
-        result.push(cprice)
-        result.push(bprice)
+        result.push(cprice.to_i)
+        result.push(bprice.to_i)
         result.push(bid)
         result.push(rest)
         result.push(condition)
@@ -759,8 +759,8 @@ class ItemsController < ApplicationController
       result.push(image)
       result.push(title)
       result.push(aucid)
-      result.push(cPrice)
-      result.push(bPrice)
+      result.push(cPrice.to_i)
+      result.push(bPrice.to_i)
       result.push("")
       result.push("")
       result.push(condition)
