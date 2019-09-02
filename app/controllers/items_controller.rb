@@ -131,7 +131,7 @@ class ItemsController < ApplicationController
       ua = CSV.read('app/others/User-Agent.csv', headers: false, col_sep: "\t")
       uanum = ua.length
       user_agent = ua[rand(uanum)][0]
-    
+
       begin
         html = open(url, "User-Agent" => user_agent) do |f|
           charset = f.charset
@@ -507,7 +507,7 @@ class ItemsController < ApplicationController
     end
 
     #利益などの計算
-    
+
     result = [
       image,
       furl,
@@ -606,9 +606,9 @@ class ItemsController < ApplicationController
       maxPrice = 0
       minPrice = 0
     end
-    
+
     surl2 = '<a href="' + surl.to_s + '" target="_blank">' + surl.to_s + '</a>'
-      
+
     result = [
       "",
       surl2,
@@ -656,7 +656,7 @@ class ItemsController < ApplicationController
         if index > 19 then
           break
         end
-        logger.debug(hit)
+        #logger.debug(hit)
         furl = hit.xpath('.//h3')[0][:href]
         title = hit.xpath('.//h3/a')[0].inner_text
         #furl = hit.xpath('.//h3[@class="Product__title"]/a')[0][:href]
@@ -675,16 +675,20 @@ class ItemsController < ApplicationController
         prices = hit.xpath('.//span[@class="Product__price"]')
         logger.debug(prices.length)
         if prices.length > 1 then
+          logger.debug("------------------------------")
+          logger.debug(prices[0].inner_html)
 
-          cprice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
-          if cprice != nil then
-            cprice = cprice[1]
-            cprice = cprice.gsub(",", "")
+          cPrice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
+          if cPrice != nil then
+            cPrice = cPrice[1]
+            cPrice = cPrice.gsub(",", "")
           else
-            cprice = 0
+            cPrice = 0
           end
 
-          bPrice = /Product__priceValue">([\s\S]*?)円/.match(prices[1].inner_html)
+          logger.debug("------------------------------")
+          logger.debug(prices[1].inner_html)
+          bPrice = /priceValue">([\s\S]*?)円/.match(prices[1].inner_html)
           if bPrice != nil then
             bPrice = bPrice[1]
             bPrice = bPrice.gsub(",", "")
@@ -692,20 +696,26 @@ class ItemsController < ApplicationController
             bPrice = 0
           end
 
+          logger.debug("========================")
+          logger.debug(cPrice)
+          logger.debug(bPrice)
+          logger.debug("========================")
+
         else
+          logger.debug("+++++++++++++++++++++++++++++++++")
           tlabel = prices[0].xpath('./span[@class="Produce__label"]')[0].inner_text
           if tlabel == "現在" then
-            cprice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
-            if cprice != nil then
-              cprice = cprice[1]
-              cprice = cprice.gsub(",", "")
+            cPrice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
+            if cPrice != nil then
+              cPrice = cPrice[1]
+              cPrice = cPrice.gsub(",", "")
             else
-              cprice = 0
+              cPrice = 0
             end
 
-            bprice = 0
+            bPrice = 0
           else
-            bprice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
+            bPrice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
             if bPrice != nil then
               bPrice = bPrice[1]
               bPrice = bPrice.gsub(",", "")
@@ -713,7 +723,7 @@ class ItemsController < ApplicationController
               bPrice = 0
             end
 
-            cprice = 0
+            cPrice = 0
           end
         end
         aucid = furl.match(/auction\/([\s\S]*?)$/)[1]
@@ -729,15 +739,15 @@ class ItemsController < ApplicationController
         else
           result.push("false")
         end
-        
+
         furl2 = '<a href="' + furl.to_s + '" target="_blank">' + furl.to_s + '</a>'
-        
+
         result.push(furl2)
         result.push(image)
         result.push(title)
         result.push(aucid)
-        result.push(cprice.to_i)
-        result.push(bprice.to_i)
+        result.push(cPrice.to_i)
+        result.push(bPrice.to_i)
         result.push(bid)
         result.push(rest)
         result.push(condition)
