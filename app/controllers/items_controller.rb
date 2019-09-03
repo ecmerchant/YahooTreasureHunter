@@ -555,11 +555,11 @@ class ItemsController < ApplicationController
     enc_keyword = URI.escape(keyword)
 
     if account != nil then
-      surl = account.url
+      surl = account.url + "&s1=cbids&o1=a"
       surl = surl.gsub("query",enc_keyword)
       eurl = surl.gsub("search/search?","closedsearch/closedsearch?")
     else
-      surl = "https://auctions.yahoo.co.jp/search/search?va=&vo=&ve=&ngrm=0&fixed=0&auccat=0&aucminprice=&aucmaxprice=&aucmin_bidorbuy_price=&aucmax_bidorbuy_price=&l0=0&abatch=0&istatus=0&gift_icon=0&charity=&ei=UTF-8&tab_ex=commerce&catid=0&slider=0&f_adv=1&fr=auc_adv&f=0x2"
+      surl = "https://auctions.yahoo.co.jp/search/search?va=&vo=&ve=&ngrm=0&fixed=0&auccat=0&aucminprice=&aucmaxprice=&aucmin_bidorbuy_price=&aucmax_bidorbuy_price=&l0=0&abatch=0&istatus=0&gift_icon=0&charity=&ei=UTF-8&tab_ex=commerce&catid=0&slider=0&f_adv=1&fr=auc_adv&f=0x2&s1=cbids&o1=a"
       surl = surl.gsub("query",enc_keyword)
       eurl = surl.gsub("search/search?","closedsearch/closedsearch?")
     end
