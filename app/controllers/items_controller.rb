@@ -162,6 +162,15 @@ class ItemsController < ApplicationController
 
       doc = Nokogiri::HTML.parse(html, charset)
 
+      logger.debug("---------------------------------------")
+      if doc.css('.a-last a').count != 0 then
+        next_url = doc.css('.a-last a')[0][:href]
+        next_url = "https://www.amazon.co.jp" + next_url.to_s
+      else
+        next_url = nil
+      end
+      logger.debug("---------------------------------------")
+
       lists = doc.css('li/@data-asin')
       if lists.count == 0 then
         lists = doc.css('div/@data-asin')
