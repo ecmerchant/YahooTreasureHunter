@@ -125,15 +125,31 @@ class ItemsController < ApplicationController
       data = []
       charset = nil
 
-      url = org_url + '&page=' + pgnum.to_s
+      #url = org_url + '&page=' + pgnum.to_s
+      #logger.debug(url)
+
+      #ua = CSV.read('app/others/User-Agent.csv', headers: false, col_sep: "\t")
+      #uanum = ua.length
+      #user_agent = ua[rand(uanum)][0]
+
+
+      url = org_url
       logger.debug(url)
 
-      ua = CSV.read('app/others/User-Agent.csv', headers: false, col_sep: "\t")
-      uanum = ua.length
-      user_agent = ua[rand(uanum)][0]
+      #ua = CSV.read('app/others/User-Agent.csv', headers: false, col_sep: "\t")
+      #uanum = ua.length
+      #user_agent = ua.sample[0]
+      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36"
+      #user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100"
+      logger.debug(user_agent)
+
+      header_option = {
+        "User-Agent" => user_agent,
+        "Connection" => "Keep-Alive"
+      }
 
       begin
-        html = open(url, "User-Agent" => user_agent) do |f|
+        html = open(url, header_option) do |f|
           charset = f.charset
           f.read # htmlを読み込んで変数htmlに渡す
         end
@@ -359,8 +375,12 @@ class ItemsController < ApplicationController
         i = 0
       end
     end
-
-    render json: data
+    res_data = {
+      data: data,
+      next_url: next_url
+    }
+    #render json: data
+    render json: res_data
   end
 
   def newuser

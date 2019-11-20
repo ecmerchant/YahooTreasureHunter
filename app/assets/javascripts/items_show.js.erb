@@ -198,13 +198,8 @@ function repajax(url,pgnum,cnum){
     type: "POST",
     data: myData,
     dataType: 'json',
-    success: function (resData) {
-      if(resData == ""){
-        alert("終了しました!");
-        document.getElementById("submit_url").innerText = "アマゾン取得";
-        document.getElementById("submit_url").className = "btn btn-primary";
-        return;
-      }
+    success: function (response) {
+
       var org_data = handsontable.getData();
       for(var i = 0; i < org_data.length; i++){
         if(org_data[i][9] == ""){
@@ -213,11 +208,17 @@ function repajax(url,pgnum,cnum){
         }
       }
 
+      var resData = response['data']
+      var next_url = response['next_url']
       var ddnum = org_data.length;
 
       Array.prototype.push.apply(org_data, resData);
-      if(org_data.length >= maxnum){
-        org_data.length = maxnum;
+
+      if(org_data.length >= maxnum || next_url == null){
+        if(next_url != null){
+          org_data.length = maxnum;
+        }
+
         handsontable.loadData(org_data);
         alert("終了しました");
         document.getElementById("submit_url").innerText = "アマゾン取得";
@@ -226,8 +227,9 @@ function repajax(url,pgnum,cnum){
       }else{
         handsontable.loadData(org_data);
         pgnum++;
-        sleep(500,repajax(url,pgnum,cnum));
+        sleep(1000,repajax(next_url,pgnum,cnum));
       }
+
     },
     error: function (resData) {
       alert("終了");
