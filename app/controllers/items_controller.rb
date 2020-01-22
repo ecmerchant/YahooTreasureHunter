@@ -32,6 +32,9 @@ class ItemsController < ApplicationController
     rt = Asin.where(user:current_user.email).pluck("rasin")
     nrt = []
     k = 0
+
+
+
     for p in 0..rt.length
       if rt[p] != nil then
         nrt[k]=[]
@@ -211,7 +214,7 @@ class ItemsController < ApplicationController
       logger.debug(pp)
       logger.debug(dd)
       for j in 0..dd-1
-        if reg_asin[j][0] == nil then
+        if reg_asin[j] == nil then
           break
         end
         data[j] = []
@@ -219,9 +222,9 @@ class ItemsController < ApplicationController
           data[j][x] = ""
         end
         data[j][0] = false
-        data[j][6] = '<a href="http://mnrate.com/item/aid/' + reg_asin[pp+j][0] + '" target="_blank">' + 'http://mnrate.com/item/aid/' + reg_asin[pp+j][0] + '</a>'
+        data[j][6] = '<a href="http://mnrate.com/item/aid/' + reg_asin[pp+j] + '" target="_blank">' + 'http://mnrate.com/item/aid/' + reg_asin[pp+j] + '</a>'
 
-        data[j][9] = reg_asin[pp+j][0]
+        data[j][9] = reg_asin[pp+j]
         data[j][14] = "⇒"
         #j += 1
       end
