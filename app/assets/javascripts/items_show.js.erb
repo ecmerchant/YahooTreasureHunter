@@ -217,6 +217,12 @@ function repajax(url,pgnum,cnum){
       if(itype != 1){
         next_url = "input_asin"
       }
+
+      console.log("---------------------------");
+      console.log(org_data.length);
+      console.log(maxnum);
+      console.log(next_url);
+
       if(org_data.length >= maxnum || next_url == null){
         if(next_url != null){
           org_data.length = maxnum;
