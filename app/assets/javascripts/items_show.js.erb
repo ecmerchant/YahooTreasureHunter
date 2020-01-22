@@ -214,6 +214,9 @@ function repajax(url,pgnum,cnum){
 
       Array.prototype.push.apply(org_data, resData);
 
+      if(itype != 1){
+        next_url = "input_asin"
+      }
       if(org_data.length >= maxnum || next_url == null){
         if(next_url != null){
           org_data.length = maxnum;
