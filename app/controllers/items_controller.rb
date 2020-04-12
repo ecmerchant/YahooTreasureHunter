@@ -169,12 +169,13 @@ class ItemsController < ApplicationController
       else
         next_url = nil
       end
-      logger.debug("---------------------------------------")
 
       lists = doc.css('li/@data-asin')
       if lists.count == 0 then
         lists = doc.css('div/@data-asin')
       end
+
+      logger.debug(lists.length)
 
       lists.each do |list|
         cnum += 1
@@ -237,13 +238,6 @@ class ItemsController < ApplicationController
     skey = ENV["AWS_SECRET_ACCESS_KEY"]
     sid = account.SellerId
     token = account.AWSkey
-
-    logger.debug("===============")
-    logger.debug(saws)
-    logger.debug(skey)
-    logger.debug(sid)
-    logger.debug(token)
-    logger.debug("===============")
 
     client = MWS.products(
       primary_marketplace_id: "A1VC38T7YXB528",
