@@ -136,10 +136,8 @@ class ItemsController < ApplicationController
       url = org_url
       logger.debug(url)
 
-      #ua = CSV.read('app/others/User-Agent.csv', headers: false, col_sep: "\t")
-      #uanum = ua.length
-      #user_agent = ua.sample[0]
-      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36"
+      user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
+      #user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36"
       #user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100"
       logger.debug(user_agent)
 
@@ -171,15 +169,16 @@ class ItemsController < ApplicationController
       end
 
       lists = doc.css('li/@data-asin')
-      if lists.count == 0 then
-        lists = doc.css('div/@data-asin')
-      end
-
       logger.debug(lists.length)
+
+      if lists.length == 0 then
+        logger.debug("CASE 1")
+        lists = doc.css('div/@data-asin')
+        logger.debug(lists.length)
+      end
 
       lists.each do |list|
         cnum += 1
-
         if cnum > maxnum then
           break
         end
