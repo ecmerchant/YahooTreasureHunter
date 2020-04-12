@@ -168,6 +168,11 @@ class ItemsController < ApplicationController
         next_url = nil
       end
 
+      targets = doc.css('div.s-result-list')
+      logger.debug(targets)
+
+      logger.debug("---------------------------------------")
+
       lists = doc.css('li/@data-asin')
       logger.debug(lists.length)
 
