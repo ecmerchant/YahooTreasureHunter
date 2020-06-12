@@ -695,8 +695,8 @@ class ItemsController < ApplicationController
           rest = hit.xpath('.//span[@class="Product__time u-textRed"]')[0].inner_text
         end
         logger.debug(title)
-
-        bid = hit.xpath('.//a[@class="Product__bid"]')[0].inner_text
+        logger.debug(hit)
+        bid = hit.xpath('.//span[@class="Product__bid"]')[0].inner_text
         image = hit.xpath('.//img[@class="Product__imageData"]')[0][:src]
         image = '<img src="' + image + '" width="80" height="60">'
         prices = hit.xpath('.//span[@class="Product__price"]')
@@ -730,7 +730,7 @@ class ItemsController < ApplicationController
 
         else
           logger.debug("+++++++++++++++++++++++++++++++++")
-          tlabel = prices[0].xpath('./span[@class="Produce__label"]')[0].inner_text
+          tlabel = prices[0].xpath('./span[@class="Product__label"]')[0].inner_text
           if tlabel == "現在" then
             cPrice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
             if cPrice != nil then
