@@ -683,7 +683,8 @@ class ItemsController < ApplicationController
         if index > 19 then
           break
         end
-        #logger.debug(hit)
+        logger.debug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        logger.debug(hit)
         #furl = hit.xpath('.//h3')[0][:href]
         #title = hit.xpath('.//h3/a')[0].inner_text
         furl = hit.xpath('.//h3[@class="Product__title"]/a')[0][:href]
@@ -692,11 +693,19 @@ class ItemsController < ApplicationController
         if rest != nil then
           rest = rest.inner_text
         else
-          rest = hit.xpath('.//span[@class="Product__time u-textRed"]')[0].inner_text
+          if hit.xpath('.//span[@class="Product__time u-textRed js-countDown"]')[0] != nil then
+            rest = hit.xpath('.//span[@class="Product__time u-textRed js-countDown"]')[0].inner_text
+          else
+            rest = "-"
+          end
         end
         logger.debug(title)
         logger.debug(hit)
-        bid = hit.xpath('.//span[@class="Product__bid"]')[0].inner_text
+        if hit.xpath('.//span[@class="Product__bid"]')[0] != nil then
+          bid = hit.xpath('.//span[@class="Product__bid"]')[0].inner_text
+        else
+          bid = "-"
+        end
         image = hit.xpath('.//img[@class="Product__imageData"]')[0][:src]
         image = '<img src="' + image + '" width="80" height="60">'
         prices = hit.xpath('.//span[@class="Product__price"]')
@@ -730,17 +739,29 @@ class ItemsController < ApplicationController
 
         else
           logger.debug("+++++++++++++++++++++++++++++++++")
-          tlabel = prices[0].xpath('./span[@class="Product__label"]')[0].inner_text
-          if tlabel == "現在" then
-            cPrice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
-            if cPrice != nil then
-              cPrice = cPrice[1]
-              cPrice = cPrice.gsub(",", "")
+          logger.debug(prices[0])
+          if prices[0].xpath('./span[@class="Product__label"]')[0] != nil then
+            tlabel = prices[0].xpath('./span[@class="Product__label"]')[0].inner_text
+            if tlabel == "現在" then
+              cPrice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
+              if cPrice != nil then
+                cPrice = cPrice[1]
+                cPrice = cPrice.gsub(",", "")
+              else
+                cPrice = 0
+              end
+
+              bPrice = 0
             else
+              bPrice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
+              if bPrice != nil then
+                bPrice = bPrice[1]
+                bPrice = bPrice.gsub(",", "")
+              else
+                bPrice = 0
+              end
               cPrice = 0
             end
-
-            bPrice = 0
           else
             bPrice = /u-textRed">([\s\S]*?)円/.match(prices[0].inner_html)
             if bPrice != nil then
@@ -749,7 +770,6 @@ class ItemsController < ApplicationController
             else
               bPrice = 0
             end
-
             cPrice = 0
           end
         end
