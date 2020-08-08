@@ -115,7 +115,7 @@ class ItemsController < ApplicationController
     logger.debug(reg_asin)
     user = current_user.email
 
-    if User.find_by(email: user).access_flg != true then
+    if User.find_by(email: user).trial_flg == true then
       maxnum = 20
     end
 
@@ -160,13 +160,19 @@ class ItemsController < ApplicationController
 
       doc = Nokogiri::HTML.parse(html, charset)
 
-      logger.debug("---------------------------------------")
+      logger.debug("-----------------Next URL----------------------")
       if doc.css('.a-last a').count != 0 then
         next_url = doc.css('.a-last a')[0][:href]
         next_url = "https://www.amazon.co.jp" + next_url.to_s
       else
-        next_url = nil
+        if doc.css('a.pagnNext').count != 0 then
+          next_url = doc.css('a.pagnNext')[0][:href]
+          next_url = "https://www.amazon.co.jp" + next_url.to_s
+        else
+          next_url = nil
+        end
       end
+      logger.debug(next_url)
 
       targets = doc.css('div.s-result-list')
       logger.debug(targets)
@@ -196,7 +202,7 @@ class ItemsController < ApplicationController
             end
             data[j][0] = false
             data[j][1] = false
-            data[j][6] = '<a href="http://mnrate.com/item/aid/' + list.value + '" target="_blank">' + 'http://mnrate.com/item/aid/' + list.value + '</a>'
+            data[j][6] = ''
             data[j][9] = list.value
             data[j][14] = "⇒"
             j += 1
@@ -224,7 +230,7 @@ class ItemsController < ApplicationController
           data[j][x] = ""
         end
         data[j][0] = false
-        data[j][6] = '<a href="http://mnrate.com/item/aid/' + reg_asin[pp+j][0] + '" target="_blank">' + 'http://mnrate.com/item/aid/' + reg_asin[pp+j][0] + '</a>'
+        data[j][6] = ''
 
         data[j][9] = reg_asin[pp+j][0]
         data[j][14] = "⇒"
