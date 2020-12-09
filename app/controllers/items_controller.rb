@@ -222,9 +222,14 @@ class ItemsController < ApplicationController
       logger.debug(pp)
       logger.debug(dd)
       for j in 0..dd-1
-        if reg_asin[j][0] == nil then
+        tasin = reg_asin[pp+j]
+        if tasin.class == Array then
+          tasin = reg_asin[pp+j][0]
+        end
+        if tasin == nil then
           break
         end
+        logger.debug(tasin)
         data[j] = []
         for x in 0..15
           data[j][x] = ""
@@ -232,7 +237,7 @@ class ItemsController < ApplicationController
         data[j][0] = false
         data[j][6] = ''
 
-        data[j][9] = reg_asin[pp+j][0]
+        data[j][9] = tasin
         data[j][14] = "⇒"
         #j += 1
       end
