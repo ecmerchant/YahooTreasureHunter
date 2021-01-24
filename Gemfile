@@ -72,7 +72,7 @@ gem 'rails_admin'
 gem 'devise-bootstrap-views'
 
 # gem for Bootstrap
-gem 'bootstrap-sass' , '~> 3.3.6'
+gem 'bootstrap-sass' , '~> 3.4.1'
 gem 'rails_12factor'
 gem 'jquery-turbolinks'
 
