@@ -226,7 +226,7 @@ function repajax(url,pgnum,cnum){
       console.log(next_url);
 
 
-      if(org_data.length >= maxnum || (next_url == "input_asin" && org_data.length <= 20) ){
+      if(org_data.length >= maxnum || (next_url == "input_asin" && org_data.length < 20 ) ){
         if(next_url != null){
           org_data.length = maxnum;
         }
